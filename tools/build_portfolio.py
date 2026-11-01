@@ -8,6 +8,10 @@ projects = [
          image='finovate-preview.jpg', url='demos/finovate/', tags=['WordPress', 'Elementor', 'Astra'],
          description='Un site de présentation autour des services financiers, avec plusieurs pages et une navigation commune.',
          role='Adaptation d’un modèle WordPress, mise en page Elementor et intégration des contenus.'),
+    dict(id='cap-pro', title='Cap Pro', category='Application web', kind='Application originale',
+         image='cap-pro-preview.jpg', url='demos/cap-pro/', tags=['JavaScript', 'HTML / CSS', 'Stockage local'],
+         description='Une application de suivi des candidatures : tableau de bord, recherche, statuts, relances et export CSV.',
+         role='Conception avec assistance IA, interface responsive, gestion des données locales et vérification des interactions.'),
     dict(id='dar-el-grill', title='Dar El Grill', category='Restaurant', kind='Démonstration',
          image='dar-el-grill-preview.jpg', url='https://sakhriabdelkhalak-dev.github.io/dar-el-grill/', tags=['HTML', 'CSS', 'JavaScript'],
          description='Un site de restaurant qui présente les spécialités, le menu et l’univers de l’établissement.',
@@ -83,7 +87,7 @@ page = '''<!DOCTYPE html>
       <div class="section-heading"><p class="eyebrow">Outils &amp; pratique</p><h2 id="skills-title">Mes compétences<span class="accent">.</span></h2><p>Des technologies utilisées dans mes projets, complétées par ma formation en développement informatique.</p></div>
       <div class="skills-grid">
         <article class="skill-group"><span class="skill-number" aria-hidden="true">01</span><h3>WordPress &amp; intégration</h3><p>Mise en page avec Elementor, personnalisation de thèmes et organisation de sites de présentation.</p>__WP_TAGS__<a class="text-link" href="#finovate">Voir Finovate ↗</a></article>
-        <article class="skill-group"><span class="skill-number" aria-hidden="true">02</span><h3>Développement web</h3><p>Intégration de pages, styles adaptés aux différentes tailles d’écran et interactions en JavaScript.</p>__WEB_TAGS__<a class="text-link" href="#dar-el-grill">Voir Dar El Grill ↗</a></article>
+        <article class="skill-group"><span class="skill-number" aria-hidden="true">02</span><h3>Développement web</h3><p>Intégration de pages, styles adaptés aux différentes tailles d’écran et interactions en JavaScript.</p>__WEB_TAGS__<a class="text-link" href="#cap-pro">Voir Cap Pro ↗</a></article>
         <article class="skill-group"><span class="skill-number" aria-hidden="true">03</span><h3>Bases &amp; outils</h3><p>Connaissances en programmation, bases de données et algorithmique. Publication de projets avec GitHub Pages.</p>__TOOLS_TAGS__<a class="text-link" href="#cv">Consulter mon parcours ↗</a></article>
       </div><p class="tools-note">Également dans ma boîte à outils : Word, Excel, PowerPoint, Photoshop et Inkscape.</p>
     </div></section>
@@ -111,4 +115,4 @@ for key, value in {
 }.items():
     page = page.replace(key, value)
 (ROOT / 'index.html').write_text(page, encoding='utf-8')
-print('Portfolio HTML generated: four real projects, one CV section, verified contact details.')
+print(f'Portfolio HTML generated: {len(projects)} projects, one CV section, verified contact details.')

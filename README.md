@@ -34,6 +34,7 @@ utilise uniquement les modules intégrés de Node.js et n’envoie aucun email.
 ```sh
 python tools/verify_portfolio.py
 node tools/verify_contact.mjs
+node tools/verify_cap_pro.cjs
 python -m http.server 8766 --bind 127.0.0.1
 ```
 
@@ -45,3 +46,13 @@ il n’effectue pas d’envoi côté serveur. Les formulaires des démos WordPre
 sont désactivés et identifiés comme démonstrations.
 
 Pour réexporter les projets WordPress, consulter [les outils](tools/README.md).
+
+## Cap Pro
+
+[Ouvrir l’application](https://sakhriabdelkhalak-dev.github.io/portfolio/demos/cap-pro/)
+
+Cap Pro est une application originale de suivi des candidatures, conçue avec
+assistance IA : tableau de bord, recherche, relances, liste/tableau, corbeille
+et export CSV. Son espace personnel est sauvegardé dans le navigateur.
+Le mode démo est séparé et utilise uniquement des exemples fictifs.
+Consulter [le projet et ses limites](demos/cap-pro/README.md).

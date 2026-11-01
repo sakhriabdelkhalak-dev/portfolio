@@ -11,7 +11,8 @@ assert len(ids) == len(set(ids)), 'Duplicate HTML IDs'
 assert ids.count('cv') == 1, 'Exactly one CV section is required'
 assert len(tree.xpath('//h1')) == 1, 'One primary page heading is required'
 cards = tree.xpath('//article[contains(@class,"project-card")]')
-assert len(cards) == 4 and cards[0].get('id') == 'finovate'
+assert len(cards) == 5 and cards[0].get('id') == 'finovate'
+assert {card.get('id') for card in cards} == {'finovate', 'cap-pro', 'dar-el-grill', 'marketing-agency', 'avengers'}
 for value in ('VOTRE-EMAIL', 'À préciser', 'provisoires', 'cv-sakhri.pdf', 'My CV', 'Ajoute ton CV'):
     assert value not in source, f'Unfinished content: {value}'
 for element in tree.xpath('//*[@src or @href or @action]'):
@@ -35,4 +36,4 @@ assert tree.xpath('//a[@href="tel:+212601345358"]'), 'Wrong contact telephone'
 assert tree.xpath('//form[@action="mailto:sakhriabdelkhalak@gmail.com"]'), 'Wrong contact recipient'
 cv_links = tree.xpath('//a[contains(@href,".pdf")]/@href')
 assert len(cv_links) == 2 and len(set(cv_links)) == 1
-print('Portfolio passed: unique IDs, four projects, local assets and anchors, CV links, labelled form and verified contact details.')
+print('Portfolio passed: unique IDs, five projects, local assets and anchors, CV links, labelled form and verified contact details.')
