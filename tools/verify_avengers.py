@@ -2,8 +2,12 @@ from pathlib import Path
 from urllib.parse import urlsplit, unquote
 from lxml import html
 import re
+import argparse
 
-root = Path(__file__).resolve().parent.parent / 'demos' / 'avengers'
+parser = argparse.ArgumentParser()
+parser.add_argument('--site', choices=['avengers', 'marketing'], default='avengers')
+site = parser.parse_args().site
+root = Path(__file__).resolve().parent.parent / 'demos' / ('avengers' if site == 'avengers' else 'marketing-agency')
 errors = []
 for page in root.rglob('*.html'):
     text = page.read_text(encoding='utf-8')

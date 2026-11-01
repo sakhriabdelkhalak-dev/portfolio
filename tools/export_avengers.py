@@ -1,15 +1,21 @@
 """Export the public stest WordPress pages for GitHub Pages; no login cookies."""
 from pathlib import Path
-from urllib.parse import urljoin, urlsplit, unquote, quote
+from urllib.parse import urljoin, urlsplit, unquote, quote, parse_qs
 from urllib.request import Request, urlopen
 from concurrent.futures import ThreadPoolExecutor
 from lxml import html
 import html as html_std
 import posixpath
 import re
+import argparse
 
-ROOT = Path(__file__).resolve().parent.parent / 'demos' / 'avengers'
-BASE = 'http://localhost/stest/'
+parser = argparse.ArgumentParser(description='Export public WordPress portfolio demos.')
+parser.add_argument('--site', choices=['avengers', 'marketing'], default='avengers')
+SITE = parser.parse_args().site
+SLUG = 'stest' if SITE == 'avengers' else 'test'
+DEMO = 'avengers' if SITE == 'avengers' else 'marketing-agency'
+ROOT = Path(__file__).resolve().parent.parent / 'demos' / DEMO
+BASE = f'http://localhost/{SLUG}/'
 PAGES = {
     '/stest/': 'index.html',
     '/stest/index.php/all/': 'all/index.html',
@@ -17,6 +23,22 @@ PAGES = {
     '/stest/index.php/iron-man/': 'iron-man/index.html',
     '/stest/index.php/thor/': 'thor/index.html',
 }
+ALIASES = {}
+if SITE == 'marketing':
+    PAGES = {
+        '/test/': 'index.html',
+        '/test/?page_id=9': 'about/index.html',
+        '/test/?page_id=11': 'portofolio/index.html',
+        '/test/?page_id=12': 'project-details/index.html',
+        '/test/?page_id=13': 'blog/index.html',
+        '/test/?page_id=10': 'contact/index.html',
+        '/test/?p=1': 'blog/hello-world/index.html',
+    }
+    ALIASES = {f'/test/{slug}/': route for slug, route in [
+        ('about', '/test/?page_id=9'), ('portofolio', '/test/?page_id=11'),
+        ('project-details', '/test/?page_id=12'), ('blog', '/test/?page_id=13'),
+        ('contact', '/test/?page_id=10'), ('hello-world', '/test/?p=1'),
+    ]}
 pending = {}
 downloaded = set()
 failures = []
@@ -33,7 +55,7 @@ def local(url):
 
 def asset_path(url):
     path = unquote(urlsplit(url).path)
-    prefix = '/stest/'
+    prefix = f'/{SLUG}/'
     if not path.startswith(prefix):
         return None
     path = path[len(prefix):]
@@ -56,8 +78,16 @@ def rewrite(raw, base, output):
         pending.setdefault(target, absolute)
         return relative(target, output) + ('#' + p.fragment if p.fragment else '')
     path = p.path.rstrip('/') + '/'
-    if path == '/stest/index.php/':
-        path = '/stest/'
+    if path == f'/{SLUG}/index.php/':
+        path = f'/{SLUG}/'
+    query = parse_qs(p.query)
+    for key in ('page_id', 'p'):
+        if key in query:
+            path += '?' + key + '=' + query[key][0]
+            break
+    if SITE == 'marketing' and any(key in query for key in ('author', 'cat')):
+        path = '/test/?page_id=13'
+    path = ALIASES.get(path, path)
     if path in PAGES:
         return relative(PAGES[path], output) + ('#' + p.fragment if p.fragment else '')
     # Unused WordPress service endpoints are never published as localhost links.
@@ -72,10 +102,10 @@ def rewrite_embedded(text, base, output, css=False):
     # Elementor's runtime config uses JSON escaped URLs for dynamic JS chunks.
     for scheme in ('http', 'https'):
         for prefix in ('wp-content/', 'wp-includes/'):
-            old = f'{scheme}://localhost/stest/{prefix}'
+            old = f'{scheme}://localhost/{SLUG}/{prefix}'
             new = relative('assets/' + prefix.rstrip('/'), output) + '/'
             text = text.replace(old, new).replace(old.replace('/', '\\/'), new.replace('/', '\\/'))
-        old = f'{scheme}://localhost/stest/'
+        old = f'{scheme}://localhost/{SLUG}/'
         new = relative('index.html', output).removesuffix('index.html') or './'
         text = text.replace(old, new).replace(old.replace('/', '\\/'), new.replace('/', '\\/'))
     return text
@@ -87,6 +117,22 @@ def render_page(item):
     tree = html.fromstring(data)
     for element in list(tree.xpath('//link[@rel="https://api.w.org/"] | //link[@rel="EditURI"] | //link[@rel="pingback"] | //link[@rel="alternate"] | //*[@id="wpadminbar"] | //script[@id="wp-api-request-js"] | //script[@id="wp-api-request-js-extra"] | //script[@type="speculationrules"]')):
         element.drop_tree()
+    if SITE == 'marketing':
+        for script in list(tree.xpath('//script[contains(@src,"contact-form-7") or contains(@id,"contact-form-7") or contains(@src,"/swv/")]')):
+            script.drop_tree()
+        for form in tree.xpath('//form'):
+            form.set('action', '#')
+            form.set('onsubmit', 'return false')
+            for field in list(form.xpath('.//input[@type="hidden"]')):
+                field.drop_tree()
+            for button in form.xpath('.//input[@type="submit"] | .//button[@type="submit"]'):
+                button.set('disabled', 'disabled')
+                if button.tag == 'input':
+                    button.set('value', 'Demo — sending disabled')
+                else:
+                    button.text = 'Demo — sending disabled'
+            note = html.fromstring('<p role="note" style="font-size:14px;padding:12px;border-left:3px solid #1976b9;background:#f3f7fa;color:#233">Demonstration form — no messages or comments are sent from this portfolio demo.</p>')
+            form.insert(0, note)
     for element in tree.iter():
         for attr in ('href', 'src', 'poster', 'data-src'):
             if attr in element.attrib:
@@ -105,7 +151,8 @@ def render_page(item):
     for element in tree.xpath('//body'):
         classes = element.get('class', '').split()
         element.set('class', ' '.join(x for x in classes if x not in ('admin-bar', 'logged-in')))
-    tree.find('head').append(html.fromstring('<meta name="description" content="Avengers Assemble — projet personnel WordPress et Elementor de Sakhri Abdelkhalak.">'))
+    description = 'Avengers Assemble' if SITE == 'avengers' else 'Marketing Agency'
+    tree.find('head').append(html.fromstring(f'<meta name="description" content="{description} — projet personnel WordPress de Sakhri Abdelkhalak.">'))
     destination = ROOT / output
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_bytes(b'<!DOCTYPE html>\n' + html.tostring(tree, encoding='utf-8', method='html'))
@@ -128,7 +175,7 @@ for item in PAGES.items():
 
 # Elementor loads widget handlers on demand. Include the installed runtime's
 # bundles so tabs, galleries, video and text widgets also work after export.
-bundle_directory = Path('C:/laragon/www/stest/wp-content/plugins/elementor/assets/js')
+bundle_directory = Path(f'C:/laragon/www/{SLUG}/wp-content/plugins/elementor/assets/js')
 for bundle in bundle_directory.glob('*.bundle.min.js'):
     name = bundle.name
     url = BASE + 'wp-content/plugins/elementor/assets/js/' + name

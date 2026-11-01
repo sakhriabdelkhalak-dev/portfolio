@@ -15,3 +15,17 @@ python tools/verify_avengers.py
 The export includes the five public character pages, their assets, navigation,
 and Elementor interactions. It does not export WordPress accounts or passwords.
 No PHP server or build step is required to host the demo.
+
+## Marketing Agency
+
+The second demo comes from `http://localhost/test/` and is published under
+`demos/marketing-agency/`. Refresh and verify it with:
+
+```sh
+python tools/export_avengers.py --site marketing
+python tools/verify_avengers.py --site marketing
+```
+
+It includes the six main pages and the sample blog article. WordPress contact
+and comment forms are explicitly marked as demonstrations with submission
+disabled. No local server credentials or account data are exported.
