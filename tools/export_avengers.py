@@ -126,8 +126,11 @@ ROOT.mkdir(parents=True, exist_ok=True)
 for item in PAGES.items():
     render_page(item)
 
-# Elementor loads these handlers on demand; preserve them alongside its runtime.
-for name in ('shared-frontend-handlers.03caa53373b56d3bab67.bundle.min.js', 'nested-tabs.e9769387c6e374e093ed.bundle.min.js', 'nested-title-keyboard-handler.a7c48b2e79bf0ef22bb3.bundle.min.js'):
+# Elementor loads widget handlers on demand. Include the installed runtime's
+# bundles so tabs, galleries, video and text widgets also work after export.
+bundle_directory = Path('C:/laragon/www/stest/wp-content/plugins/elementor/assets/js')
+for bundle in bundle_directory.glob('*.bundle.min.js'):
+    name = bundle.name
     url = BASE + 'wp-content/plugins/elementor/assets/js/' + name
     pending[asset_path(url)] = url
 
