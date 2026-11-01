@@ -114,6 +114,9 @@ def render_page(item):
     source, output = item
     url = 'http://localhost' + source
     data, _ = fetch(url)
+    if b'wp-emoji-release.min.js' in data:
+        emoji_url = BASE + 'wp-includes/js/wp-emoji-release.min.js'
+        pending[asset_path(emoji_url)] = emoji_url
     tree = html.fromstring(data)
     for element in list(tree.xpath('//link[@rel="https://api.w.org/"] | //link[@rel="EditURI"] | //link[@rel="pingback"] | //link[@rel="alternate"] | //*[@id="wpadminbar"] | //script[@id="wp-api-request-js"] | //script[@id="wp-api-request-js-extra"] | //script[@type="speculationrules"]')):
         element.drop_tree()
