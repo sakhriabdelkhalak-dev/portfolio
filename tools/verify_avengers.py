@@ -5,9 +5,9 @@ import re
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--site', choices=['avengers', 'marketing'], default='avengers')
+parser.add_argument('--site', choices=['avengers', 'marketing', 'finovate'], default='avengers')
 site = parser.parse_args().site
-root = Path(__file__).resolve().parent.parent / 'demos' / ('avengers' if site == 'avengers' else 'marketing-agency')
+root = Path(__file__).resolve().parent.parent / 'demos' / {'avengers': 'avengers', 'marketing': 'marketing-agency', 'finovate': 'finovate'}[site]
 errors = []
 for page in root.rglob('*.html'):
     text = page.read_text(encoding='utf-8')

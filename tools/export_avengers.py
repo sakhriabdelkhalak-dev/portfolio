@@ -10,10 +10,10 @@ import re
 import argparse
 
 parser = argparse.ArgumentParser(description='Export public WordPress portfolio demos.')
-parser.add_argument('--site', choices=['avengers', 'marketing'], default='avengers')
+parser.add_argument('--site', choices=['avengers', 'marketing', 'finovate'], default='avengers')
 SITE = parser.parse_args().site
-SLUG = 'stest' if SITE == 'avengers' else 'test'
-DEMO = 'avengers' if SITE == 'avengers' else 'marketing-agency'
+SLUG = {'avengers': 'stest', 'marketing': 'test', 'finovate': 'fox'}[SITE]
+DEMO = {'avengers': 'avengers', 'marketing': 'marketing-agency', 'finovate': 'finovate'}[SITE]
 ROOT = Path(__file__).resolve().parent.parent / 'demos' / DEMO
 BASE = f'http://localhost/{SLUG}/'
 PAGES = {
@@ -39,6 +39,26 @@ if SITE == 'marketing':
         ('project-details', '/test/?page_id=12'), ('blog', '/test/?page_id=13'),
         ('contact', '/test/?page_id=10'), ('hello-world', '/test/?p=1'),
     ]}
+elif SITE == 'finovate':
+    PAGES = {
+        '/fox/?page_id=23': 'index.html',
+        '/fox/?page_id=26': 'services/index.html',
+        '/fox/?page_id=37': 'about/index.html',
+        '/fox/?page_id=39': 'insights/index.html',
+        '/fox/?page_id=41': 'testimonial/index.html',
+        '/fox/?page_id=43': 'contact/index.html',
+        '/fox/?page_id=49': 'home-1/index.html',
+        '/fox/?page_id=51': 'home-2/index.html',
+        '/fox/?page_id=15': 'the-new-page/index.html',
+    }
+    ALIASES = {'/fox/': '/fox/?page_id=23'}
+    ALIASES.update({f'/fox/{slug}/': route for slug, route in [
+        ('home', '/fox/?page_id=23'), ('services', '/fox/?page_id=26'),
+        ('about', '/fox/?page_id=37'), ('insights', '/fox/?page_id=39'),
+        ('testimonial', '/fox/?page_id=41'), ('contact', '/fox/?page_id=43'),
+        ('1-2', '/fox/?page_id=49'), ('2-2', '/fox/?page_id=51'),
+        ('the-new-page', '/fox/?page_id=15'),
+    ]})
 pending = {}
 downloaded = set()
 failures = []
@@ -120,7 +140,7 @@ def render_page(item):
     tree = html.fromstring(data)
     for element in list(tree.xpath('//link[@rel="https://api.w.org/"] | //link[@rel="EditURI"] | //link[@rel="pingback"] | //link[@rel="alternate"] | //*[@id="wpadminbar"] | //script[@id="wp-api-request-js"] | //script[@id="wp-api-request-js-extra"] | //script[@type="speculationrules"]')):
         element.drop_tree()
-    if SITE == 'marketing':
+    if SITE != 'avengers':
         for script in list(tree.xpath('//script[contains(@src,"contact-form-7") or contains(@id,"contact-form-7") or contains(@src,"/swv/")]')):
             script.drop_tree()
         for form in tree.xpath('//form'):
@@ -136,6 +156,30 @@ def render_page(item):
                     button.text = 'Demo — sending disabled'
             note = html.fromstring('<p role="note" style="font-size:14px;padding:12px;border-left:3px solid #1976b9;background:#f3f7fa;color:#233">Demonstration form — no messages or comments are sent from this portfolio demo.</p>')
             form.insert(0, note)
+    if SITE == 'finovate':
+        body = tree.find('body')
+        # Fixed overlays must not inherit Elementor container transforms.
+        for overlay in tree.xpath('//*[@id="contactPanel" or @id="openPanel"]'):
+            overlay.getparent().remove(overlay)
+            body.append(overlay)
+        for script in list(tree.xpath('//script')):
+            if 'openPanel' in (script.text or '') and 'addEventListener' in (script.text or ''):
+                script.getparent().remove(script)
+                body.append(script)
+        for image in tree.xpath('//img[contains(@src,"via.placeholder.com")]'):
+            image.set('src', BASE + 'wp-content/uploads/2025/10/pexels-fauxels-3182781-1024x683.jpg')
+        for anchor in tree.xpath('//a'):
+            label = ' '.join(anchor.text_content().split()).lower()
+            if label in ("let's get started", 'schedule a call', 'get in touch today →'):
+                anchor.set('href', BASE + '?page_id=43')
+                anchor.set('class', anchor.get('class', '') + ' demo-contact-link')
+            elif label in ('learn more', 'our philosophy'):
+                anchor.set('href', BASE + '?page_id=37')
+            elif 'finovate.vamtam.com/services/' in anchor.get('href', ''):
+                anchor.set('href', BASE + '?page_id=26')
+        fixes = html.Element('style')
+        fixes.text = '.entry-header{display:none}.elementor-23 .elementor-element.elementor-element-a086beb{color:#1a3b34!important;opacity:1!important;visibility:visible!important;transform:none!important}.elementor-23 .elementor-element-a086beb h1{color:#1a3b34!important}.demo-contact-link,.demo-contact-link *{color:#1a3b34!important}.contact-panel{max-width:100vw;box-sizing:border-box;height:100vh!important;visibility:hidden}.contact-panel.active{visibility:visible}.contact-panel a.demo-contact-link,.contact-panel a.demo-contact-link *{color:#fff!important}body:has(.contact-panel.active) #openPanel{display:none}@media(max-width:767px){.hfe-dropdown{background:#fff!important;z-index:1000!important}.elementor-23 .elementor-element-04313c3{z-index:1001}}'
+        tree.find('head').append(fixes)
     for element in tree.iter():
         for attr in ('href', 'src', 'poster', 'data-src'):
             if attr in element.attrib:
@@ -154,7 +198,7 @@ def render_page(item):
     for element in tree.xpath('//body'):
         classes = element.get('class', '').split()
         element.set('class', ' '.join(x for x in classes if x not in ('admin-bar', 'logged-in')))
-    description = 'Avengers Assemble' if SITE == 'avengers' else 'Marketing Agency'
+    description = {'avengers': 'Avengers Assemble', 'marketing': 'Marketing Agency', 'finovate': 'Finovate'}[SITE]
     tree.find('head').append(html.fromstring(f'<meta name="description" content="{description} — projet personnel WordPress de Sakhri Abdelkhalak.">'))
     destination = ROOT / output
     destination.parent.mkdir(parents=True, exist_ok=True)

@@ -29,3 +29,17 @@ python tools/verify_avengers.py --site marketing
 It includes the six main pages and the sample blog article. WordPress contact
 and comment forms are explicitly marked as demonstrations with submission
 disabled. No local server credentials or account data are exported.
+
+## Finovate
+
+The `fox` WordPress project is published under `demos/finovate/`:
+
+```sh
+python tools/export_avengers.py --site finovate
+python tools/verify_avengers.py --site finovate
+```
+
+Its Home page (ID 23) is the exported landing page. The demo includes its nine
+published pages, localizes internal navigation, replaces a dead placeholder
+image with the existing team photograph, and fixes the heading contrast.
+Contact forms remain demonstrations with submission disabled.
