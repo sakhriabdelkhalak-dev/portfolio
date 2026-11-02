@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f15b3a">
+  <meta name="description" content="Loop Market : une petite boutique audio de démonstration, avec recherche, favoris et panier interactif. Projet de Sakhri Abdelkhalak, sans achat réel.">
+  <title>Loop Market — Le petit marché du son</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="shop.css?v=1">
+  <script src="catalog.js?v=1" defer></script>
+  <script src="shop.js?v=1" defer></script>
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol><symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 5.3a5.3 5.3 0 0 0-7.5 0L12 6.6l-1.3-1.3a5.3 5.3 0 0 0-7.5 7.5L12 22l8.8-9.2a5.3 5.3 0 0 0 0-7.5Z"/></symbol><symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 7h14l1 14H4L5 7Z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 5l7 7-7 7"/></symbol><symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol><symbol id="i-headphones" viewBox="0 0 24 24"><path d="M3 14v-3a9 9 0 0 1 18 0v3M3 12h4v9H5a2 2 0 0 1-2-2v-7Zm18 0h-4v9h2a2 2 0 0 0 2-2v-7Z"/></symbol></svg>
+  <a class="skip" href="#catalogue">Aller aux produits</a>
+  <div class="utility"><div class="container"><span>Une boutique de démonstration. Aucun achat réel.</span><a href="../../index.html#loop-market">Le portfolio de Sakhri ↗</a></div></div>
+  <header class="shop-header"><div class="container header-inner">
+    <a class="brand" href="#" data-reset aria-label="Loop Market — accueil"><span class="logo-mark" aria-hidden="true"></span><span>loop<span class="brand-light">market</span><small>Le petit marché du son.</small></span></a>
+    <form class="search" id="searchForm" role="search"><label class="sr-only" for="searchInput">Rechercher un produit</label><input id="searchInput" type="search" placeholder="Un casque, un micro, une idée…" maxlength="150"><button type="submit" aria-label="Rechercher"><svg class="icon"><use href="#i-search"/></svg></button></form>
+    <div class="header-actions"><button class="header-action" id="favoritesButton" aria-pressed="false"><span class="action-icon"><svg class="icon"><use href="#i-heart"/></svg><b id="favoritesCount">0</b></span><span>Favoris</span></button><button class="header-action" id="cartButton"><span class="action-icon"><svg class="icon"><use href="#i-bag"/></svg><b id="cartCount">0</b></span><span>Panier</span></button></div>
+  </div></header>
+  <main>
+    <section class="hero container" aria-labelledby="heroTitle"><div class="hero-copy"><p class="eyebrow"><span></span>MUSIC, GEAR & BONNES VIBRATIONS</p><h1 id="heroTitle">Un bon son.<br>De bonnes <em>idées.</em></h1><p>Une petite sélection audio, pour les grandes envies de musique. Découvrez six essentiels et essayez l’expérience shopping.</p><a class="button primary" href="#catalogue">Explorer la collection <svg class="icon"><use href="#i-arrow"/></svg></a><div class="hero-bottom"><span>À partir de <strong id="minimumPrice">89 DH</strong></span><span>Catalogue fictif · prix illustratifs</span></div></div><div class="hero-art"><div class="hero-circle" aria-hidden="true"></div><span class="hero-stamp">LE SON<br>À VOTRE<br>RYTHME.</span><img src="images/headphones.jpg" width="900" height="900" alt="Casque Pulse ivoire, visuel de produit fictif" fetchpriority="high"><div class="hero-product"><span>Casque sans fil Pulse</span><strong>349 DH</strong><span class="mini-arrow" aria-hidden="true">↗</span></div></div></section>
+    <div class="benefits container" aria-label="À propos de cette boutique"><div><svg class="icon"><use href="#i-headphones"/></svg><span><strong>6 essentiels audio</strong><small>Une sélection volontairement simple</small></span></div><div><svg class="icon"><use href="#i-bag"/></svg><span><strong>Un panier qui vous suit</strong><small>Conservé dans votre navigateur</small></span></div><div><span class="benefit-symbol" aria-hidden="true">✦</span><span><strong>Explorez en toute liberté</strong><small>Démonstration, sans paiement</small></span></div></div>
+    <section class="catalog-section container" id="catalogue" aria-labelledby="catalogTitle"><div class="section-heading"><div><p class="eyebrow">LA SÉLECTION LOOP</p><h2 id="catalogTitle">À chaque envie,<br>son accessoire<span>.</span></h2></div><p>De quoi écouter, créer et aménager<br>votre petit coin musique.</p></div>
+      <div class="catalog-toolbar"><div class="categories" role="group" aria-label="Catégories de produits"><button data-category="all" aria-pressed="true">Tout voir <span>6</span></button><button data-category="audio" aria-pressed="false">Audio</button><button data-category="studio" aria-pressed="false">Studio</button><button data-category="accessories" aria-pressed="false">Accessoires</button></div><label class="sort-label"><span class="sr-only">Trier les produits</span><select id="sortSelect"><option value="selection">Notre sélection</option><option value="price-asc">Prix croissant</option><option value="price-desc">Prix décroissant</option></select></label></div>
+      <div class="budget-row"><label for="budgetInput">Budget max. <output id="budgetOutput" for="budgetInput">700 DH</output></label><input id="budgetInput" type="range" min="0" max="700" step="10" value="700"><span id="resultCount" role="status">6 produits à découvrir</span></div>
+      <div id="storageNotice" class="storage-notice" role="status" hidden></div>
+      <div class="product-grid" id="productGrid"></div>
+    </section>
+    <section class="closing container"><div class="closing-icon" aria-hidden="true">↗</div><div><p class="eyebrow">UN PETIT PROJET, UNE VRAIE INTERACTION</p><h2>Choisissez. Ajoutez. Explorez.</h2><p>Recherche, favoris, fiches produits et panier : tout se teste ici. Le récapitulatif est une simulation, sans commande transmise.</p></div><a href="../../index.html#loop-market">Découvrir le projet<br>dans mon portfolio ↗</a></section>
+  </main>
+  <footer class="container shop-footer"><div class="footer-brand">loop<span>market</span><p>Le petit marché du son.</p></div><p>Projet personnel de Sakhri Abdelkhalak, conçu avec assistance IA.<br>Produits fictifs et visuels générés pour cette démonstration.</p><a href="https://github.com/sakhriabdelkhalak-dev/portfolio/tree/main/demos/loop-market" target="_blank" rel="noopener noreferrer">Code source ↗</a></footer>
+
+  <dialog class="product-dialog" id="productDialog" aria-labelledby="productTitle"><button class="icon-button dialog-close" id="closeProduct" aria-label="Fermer la fiche produit"><svg class="icon"><use href="#i-close"/></svg></button><div id="productDetails"></div></dialog>
+  <dialog class="cart-dialog" id="cartDialog" aria-labelledby="cartTitle"><header class="cart-header"><div><p class="eyebrow">VOTRE PETITE SÉLECTION</p><h2 id="cartTitle">Mon panier<span id="cartItemCount">0 article</span></h2></div><button class="icon-button" id="closeCart" aria-label="Fermer le panier"><svg class="icon"><use href="#i-close"/></svg></button></header><div id="cartContents"></div></dialog>
+  <dialog class="receipt-dialog" id="receiptDialog" aria-labelledby="receiptTitle"><button class="icon-button dialog-close" id="closeReceipt" aria-label="Fermer le récapitulatif"><svg class="icon"><use href="#i-close"/></svg></button><div id="receiptContents"></div></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="noscript">Activez JavaScript pour parcourir les produits et essayer le panier de démonstration.</p></noscript>
+</body>
+</html>
